@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pastel Craft Studio | ร้านค้าน่ารักมินิมอล</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Kanit & Mitr -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Mitr:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pastel-pink': '#FFD1DC',
+                        'pastel-pink-soft': '#FFF0F3',
+                        'pastel-pink-dark': '#FF94AA',
+                        'pastel-yellow': '#FFF9D6',
+                        'pastel-yellow-soft': '#FFFDF0',
+                        'pastel-yellow-dark': '#FFEAA7',
+                        'pastel-cream': '#FFFAF7',
+                        'pastel-peach': '#FFE4E1',
+                        'soft-gray': '#6C635F',
+                        'soft-gray-light': '#9E9490'
+                    },
+                    fontFamily: {
+                        kanit: ['Kanit', 'sans-serif'],
+                        mitr: ['Mitr', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft-cute': '0 8px 25px -4px rgba(255, 209, 220, 0.35), 0 6px 12px -5px rgba(255, 249, 214, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Kanit', 'Mitr', sans-serif;
+            background-color: #FFFAF7;
+            background-image: 
+                radial-gradient(#FFD1DC 0.75px, transparent 0.75px), 
+                radial-gradient(#FFF9D6 0.75px, #FFFAF7 0.75px);
+            background-size: 26px 26px;
+            background-position: 0 0, 13px 13px;
+            color: #6C635F;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFF0F3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FFD1DC;
+            border-radius: 20px;
+        }
+
+        .cute-hover-bounce {
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .cute-hover-bounce:hover {
+            transform: translateY(-3px) scale(1.01);
+        }
+
+        .modal-backdrop {
+            background-color: rgba(108, 99, 95, 0.35);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Vinyl Record Spin Animation */
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-vinyl {
+            animation: spinSlow 4s linear infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-pastel-pink selection:text-white">
+
+    <!-- Audio Player Element -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Top Decorative Gradient Line -->
+    <div class="bg-gradient-to-r from-pastel-pink via-pastel-yellow to-pastel-pink h-2 w-full"></div>
+
+    <!-- FLOATING TOP-LEFT MINIMALIST VINYL MUSIC PLAYER -->
+    <div class="fixed top-3 left-3 z-40 flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2 py-1 rounded-full border border-pastel-pink/60 shadow-sm">
+        <button onclick="toggleMusic()" class="relative group flex items-center justify-center">
+            <div id="vinylRecord" class="w-7 h-7 rounded-full bg-stone-800 border-2 border-amber-100 flex items-center justify-center shadow-xs transition-transform">
+                <div class="w-2.5 h-2.5 rounded-full bg-pastel-pink border border-white flex items-center justify-center">
+                    <div class="w-0.5 h-0.5 rounded-full bg-stone-800"></div>
+                </div>
+            </div>
+            <div id="musicIconBadge" class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-pastel-pink text-[8px] text-white flex items-center justify-center shadow">
+                <i class="fa-solid fa-play"></i>
+            </div>
+        </button>
+        <span id="musicTitle" class="text-[10px] text-soft-gray font-medium max-w-[80px] truncate hidden sm:inline"> เพลงชิลๆ</span>
+        <button onclick="changeMusicUrl()" class="text-[9px] text-soft-gray-light hover:text-pastel-pink-dark p-0.5" title="ตั้งค่าลิงก์เพลง">
+            <i class="fa-solid fa-gear"></i>
+        </button>
+    </div>
+
+    <div class="max-w-3xl mx-auto px-4 py-6 w-full space-y-6">
+
+        <!-- Admin View Switcher -->
+        <div class="flex justify-end">
+            <button onclick="toggleAdminView()" id="adminToggleBtn" class="text-xs px-3.5 py-1.5 rounded-full bg-white/90 border border-pastel-pink/60 text-soft-gray hover:bg-pastel-pink hover:text-white transition-all shadow-sm flex items-center gap-1.5 font-medium">
+                <i class="fa-solid fa-user-gear text-pastel-pink-dark"></i>
+                <span>โหมด: <strong id="adminStatusText" class="text-pastel-pink-dark">ลูกค้า</strong></span>
+            </button>
+        </div>
+
+        <!-- 1. HEADER & STORE BIO (Original Large Logo Left, Bio Right) -->
+        <header class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-soft-cute border-2 border-pastel-pink-soft flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
+            <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-pastel-yellow/30 rounded-full blur-xl pointer-events-none"></div>
+            <div class="absolute -left-8 -top-8 w-36 h-36 bg-pastel-pink/30 rounded-full blur-xl pointer-events-none"></div>
+
+            <!-- Left: Original Large Store Logo -->
+            <div class="flex items-center gap-4 z-10 shrink-0">
+                <div class="relative group cursor-pointer">
+                    <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full p-1.5 bg-gradient-to-tr from-pastel-pink via-pastel-yellow to-pastel-pink shadow-md transform group-hover:rotate-6 transition-transform duration-300">
+                        <div class="w-full h-full rounded-full bg-white p-1.5 flex items-center justify-center overflow-hidden border-2 border-dashed border-pastel-pink-dark">
+                            <img id="storeLogo" src="https://placehold.co/300x300/FFD1DC/6C635F?text=+Logo" alt="Store Logo" class="w-full h-full object-cover rounded-full">
+                        </div>
+                    </div>
+                    <span class="absolute bottom-1 right-1 bg-pastel-yellow text-amber-900 text-xs px-2.5 py-0.5 rounded-full font-bold shadow border-2 border-white">
+                        <i class="fa-solid fa-heart text-pink-400"></i> Open
+                    </span>
+                </div>
+            </div>
+
+            <!-- Right: Store Bio -->
+            <div class="flex-1 text-center sm:text-left z-10 space-y-2">
+                <div class="inline-block bg-pastel-pink-soft text-pastel-pink-dark text-xs font-bold px-3 py-1 rounded-full border border-pastel-pink/40">
+                     Minimalist Pastel Studio
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold text-soft-gray tracking-wide flex items-center justify-center sm:justify-start gap-1.5">
+                    Pastel Cute Craft Studio 
+                </h1>
+                <p class="text-soft-gray-light text-xs sm:text-sm leading-relaxed">
+                    ร้านรับทำกราฟิก & ของตกแต่งน่ารักสไตล์มินิมอล อบอุ่น ละมุนตา ยินดีให้บริการค่ะ 
+                </p>
+                <div class="pt-1 flex flex-wrap gap-2 justify-center sm:justify-start">
+                    <span class="bg-pastel-yellow-soft text-amber-800 text-xs px-2.5 py-1 rounded-xl border border-pastel-yellow-dark/40 font-medium"> งานไว ใส่ใจทุกรายละเอียด</span>
+                    <span class="bg-pastel-pink-soft text-pink-700 text-xs px-2.5 py-1 rounded-xl border border-pastel-pink/40 font-medium"> สอบถามได้ตลอดค่ะ</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- BANNER SPACE (Between Item 1 and 2): 1122 x 495 Pixel Ratio -->
+        <section>
+            <div class="relative group rounded-3xl overflow-hidden bg-white p-2 border-2 border-pastel-yellow/70 shadow-soft-cute">
+                <div class="relative w-full overflow-hidden rounded-2xl bg-pastel-yellow-soft border border-pastel-pink/20" style="padding-top: 44.11%;">
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <img id="mainBannerImg" src="https://placehold.co/1122x495/FFF9D6/6C635F?text=+Welcome+to+Pastel+Craft+Studio+(1122+x+495+Pixel)+" 
+                             alt="Main Banner" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        
+                        <!-- Overlay Edit Button for Admin -->
+                        <div id="bannerAdminControl" class="hidden absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-1.5 rounded-xl shadow border border-pastel-pink">
+                            <button onclick="changeBannerUrl()" class="text-xs bg-pastel-pink text-soft-gray px-2.5 py-1 rounded-lg hover:bg-pastel-pink-dark hover:text-white transition">
+                                <i class="fa-solid fa-image mr-1"></i> เปลี่ยนรูปแบนเนอร์
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. PORTFOLIO GALLERY (6 FRAMES - 2 ROWS x 3 COLUMNS) -->
+        <section class="bg-white/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl shadow-soft-cute border-2 border-pastel-pink-soft">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-base font-bold text-soft-gray flex items-center gap-2">
+                        <span></span> ตัวอย่างผลงาน
+                    </h2>
+                    <p class="text-xs text-soft-gray-light">กดดูรูปตัวอย่างผลงานขยายใหญ่ได้ค่ะ</p>
+                </div>
+                <button id="adminAddPortfolioBtn" onclick="openAddPortfolioModal()" class="hidden text-xs bg-pastel-pink hover:bg-pastel-pink-dark text-soft-gray hover:text-white px-3 py-1.5 rounded-xl font-medium transition border border-pastel-pink">
+                    <i class="fa-solid fa-plus mr-1"></i> เพิ่มรูป
+                </button>
+            </div>
+
+            <!-- STRICT 3 COLUMNS GRID (6 Compact Frames = Exactly 2 Rows) -->
+            <div id="portfolioGrid" class="grid grid-cols-3 gap-3 sm:gap-4">
+                <!-- Dynamic 6 Portfolio Cards -->
+            </div>
+        </section>
+
+        <!-- 3. CHECK QUEUE SECTION (ONLY CLEAN "เช็คคิว" BUTTON) -->
+        <section class="bg-white/95 backdrop-blur-md rounded-3xl p-4 shadow-soft-cute border-2 border-pastel-yellow flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-pastel-yellow-soft border border-pastel-yellow-dark/40 flex items-center justify-center text-base text-amber-700 font-bold shrink-0 shadow-sm">
+                    
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-soft-gray">ระบบคิวงาน</h3>
+                    <p class="text-xs text-soft-gray-light">ตรวจสอบสถานะหลอดคิวงาน (%)</p>
+                </div>
+            </div>
+
+            <!-- Minimalist Single "เช็คคิว" Button -->
+            <button onclick="toggleQueueModal(true)" class="cute-hover-bounce bg-gradient-to-r from-pastel-pink via-pastel-yellow to-pastel-pink text-soft-gray font-bold px-6 py-2 rounded-2xl shadow-sm border border-white hover:shadow-md flex items-center gap-2 text-xs sm:text-sm shrink-0">
+                <i class="fa-solid fa-list-check text-pink-500"></i>
+                <span>เช็คคิว</span>
+                <span class="bg-white text-pink-500 text-xs px-2 py-0.5 rounded-full font-extrabold shadow-none" id="totalQueueBadge">5</span>
+            </button>
+        </section>
+
+        <!-- 4. QUICK LINKS BAR (MINIMAL ANIMAL CARDS - CAT, BEAR, RABBIT) -->
+        <section class="grid grid-cols-3 gap-3 sm:gap-4">
+            <!-- Cat: Blog Link -->
+            <a href="#blog" onclick="showNotification(' ไปยังหน้าบล็อก')" class="cute-hover-bounce bg-white/95 p-3 sm:p-4 rounded-3xl shadow-soft-cute border-2 border-pastel-pink/40 flex flex-col sm:flex-row items-center justify-center gap-2.5 group cursor-pointer text-center sm:text-left">
+                <div class="w-10 h-10 rounded-2xl bg-pastel-pink-soft border border-pastel-pink flex items-center justify-center p-1 group-hover:rotate-12 transition-transform shrink-0 overflow-hidden">
+                    <img src="https://api.iconify.design/fluent-emoji:cat-face.svg" alt="Blog Cat" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h3 class="font-bold text-soft-gray text-xs sm:text-sm group-hover:text-pastel-pink-dark transition-colors">บล็อก</h3>
+                    <p class="text-[10px] text-soft-gray-light hidden sm:block">บทความน่าอ่าน</p>
+                </div>
+            </a>
+
+            <!-- Bear: Comics Link -->
+            <a href="#webtoon" onclick="showNotification(' ไปยังหน้าการ์ตูนตูน')" class="cute-hover-bounce bg-white/95 p-3 sm:p-4 rounded-3xl shadow-soft-cute border-2 border-pastel-yellow-dark/40 flex flex-col sm:flex-row items-center justify-center gap-2.5 group cursor-pointer text-center sm:text-left">
+                <div class="w-10 h-10 rounded-2xl bg-pastel-yellow-soft border border-pastel-yellow-dark flex items-center justify-center p-1 group-hover:-rotate-12 transition-transform shrink-0 overflow-hidden">
+                    <img src="https://api.iconify.design/fluent-emoji:bear.svg" alt="Webtoon Bear" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h3 class="font-bold text-soft-gray text-xs sm:text-sm group-hover:text-amber-600 transition-colors">ตูน</h3>
+                    <p class="text-[10px] text-soft-gray-light hidden sm:block">การ์ตูนสุดคิ้วท์</p>
+                </div>
+            </a>
+
+            <!-- Rabbit: Decor Link -->
+            <a href="#decor" onclick="showNotification(' ไปยังหน้าของตกแต่ง')" class="cute-hover-bounce bg-white/95 p-3 sm:p-4 rounded-3xl shadow-soft-cute border-2 border-pastel-peach flex flex-col sm:flex-row items-center justify-center gap-2.5 group cursor-pointer text-center sm:text-left">
+                <div class="w-10 h-10 rounded-2xl bg-pastel-pink-soft border border-pastel-pink flex items-center justify-center p-1 group-hover:rotate-12 transition-transform shrink-0 overflow-hidden">
+                    <img src="https://api.iconify.design/fluent-emoji:rabbit-face.svg" alt="Decor Rabbit" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h3 class="font-bold text-soft-gray text-xs sm:text-sm group-hover:text-pastel-pink-dark transition-colors">ของตกแต่ง</h3>
+                    <p class="text-[10px] text-soft-gray-light hidden sm:block">แจก PNG ฟรี</p>
+                </div>
+            </a>
+        </section>
+
+        <!-- 5. REVIEWS SECTION (ONLY CLEAN "รีวิว" BUTTON) -->
+        <section class="bg-white/95 backdrop-blur-md rounded-3xl p-4 shadow-soft-cute border-2 border-pastel-pink-soft flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-pastel-pink-soft border border-pastel-pink flex items-center justify-center text-base text-pink-500 font-bold shrink-0 shadow-sm">
+                    
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <h3 class="text-sm font-bold text-soft-gray">รีวิวความพึงพอใจ</h3>
+                        <div class="flex text-amber-400 text-xs ml-1">
+                            <i class="fa-solid fa-star"></i>
+                            <span class="text-xs font-bold text-soft-gray ml-1" id="avgRatingText">4.9</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-soft-gray-light" id="reviewCountText">คะแนนและรีวิวจากลูกค้า</p>
+                </div>
+            </div>
+
+            <!-- Single "รีวิว" Button -->
+            <button onclick="toggleReviewModal(true)" class="cute-hover-bounce bg-pastel-pink hover:bg-pastel-pink-dark text-soft-gray hover:text-white font-bold px-6 py-2 rounded-2xl shadow-sm border border-white transition flex items-center gap-2 text-xs sm:text-sm shrink-0">
+                <i class="fa-solid fa-comment-dots"></i>
+                <span>รีวิว</span>
+            </button>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white/80 border-t border-pastel-pink/30 py-4 mt-8">
+        <div class="max-w-3xl mx-auto px-4 text-center text-xs text-soft-gray-light">
+            <p class="flex items-center justify-center gap-1">
+                <span>Pastel Cute Craft Studio &copy; 2026. All rights reserved.</span> <i class="fa-solid fa-heart text-pink-400"></i>
+            </p>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: Order Queue Progress Modal -->
+    <div id="queueModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-3">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl border-2 border-pastel-yellow overflow-hidden">
+            <div class="p-4 bg-gradient-to-r from-pastel-pink-soft via-pastel-yellow-soft to-pastel-pink-soft border-b border-pastel-yellow/50 flex justify-between items-center">
+                <div>
+                    <h3 class="text-sm font-bold text-soft-gray flex items-center gap-1.5">
+                        <span></span> ตรวจสอบสถานะคิวงาน (%)
+                    </h3>
+                    <p class="text-[10px] text-soft-gray-light">หลอดเปอร์เซ็นต์ความคืบหน้า 5 ระดับสถานะ</p>
+                </div>
+                <button onclick="toggleQueueModal(false)" class="w-7 h-7 rounded-full bg-white text-soft-gray hover:text-gray-700 flex items-center justify-center transition text-xs shadow-sm">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- 5 Progress Levels Status Legend -->
+            <div class="grid grid-cols-5 gap-1 p-2 bg-pastel-yellow-soft/50 border-b border-pastel-yellow/30 text-center text-[9px]">
+                <div class="bg-white p-1 rounded-lg border border-gray-100">
+                    <div class="text-gray-500">รอบริฟ</div>
+                    <div class="font-extrabold text-gray-400">0%</div>
+                </div>
+                <div class="bg-white p-1 rounded-lg border border-pink-100">
+                    <div class="text-gray-500">บริฟแล้ว</div>
+                    <div class="font-extrabold text-pink-500">25%</div>
+                </div>
+                <div class="bg-white p-1 rounded-lg border border-amber-100">
+                    <div class="text-gray-500">กำลังทำ</div>
+                    <div class="font-extrabold text-amber-500">50%</div>
+                </div>
+                <div class="bg-white p-1 rounded-lg border border-blue-100">
+                    <div class="text-gray-500">รอเช็ค</div>
+                    <div class="font-extrabold text-blue-500">75%</div>
+                </div>
+                <div class="bg-white p-1 rounded-lg border border-emerald-100">
+                    <div class="text-gray-500">ส่งงานแล้ว</div>
+                    <div class="font-extrabold text-emerald-500">100%</div>
+                </div>
+            </div>
+
+            <div class="p-3 bg-gray-50/50 border-b border-gray-100 flex gap-2">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-gray-400"></i>
+                    <input type="text" id="queueSearchInput" onkeyup="filterQueueList()" placeholder="ค้นหารายชื่อ หรือ รหัสคิว..." 
+                           class="w-full text-xs pl-8 pr-3 py-1.5 rounded-xl border border-gray-200 focus:outline-none focus:border-pastel-pink bg-white">
+                </div>
+                <button id="adminAddQueueBtn" onclick="openAddQueueModal()" class="hidden text-xs bg-pastel-yellow text-amber-800 hover:bg-pastel-yellow-dark px-3 py-1.5 rounded-xl font-bold transition shadow-sm border border-pastel-yellow-dark">
+                    <i class="fa-solid fa-plus mr-1"></i> เพิ่มคิว
+                </button>
+            </div>
+
+            <div class="p-3 overflow-y-auto flex-1 space-y-3" id="queueItemsList"></div>
+
+            <div class="p-3 bg-gray-50 border-t border-gray-100 flex justify-between items-center text-xs text-soft-gray-light">
+                <span>สอบถามความคืบหน้าทักแชทได้ตลอดค่ะ</span>
+                <button onclick="toggleQueueModal(false)" class="px-3.5 py-1.5 bg-gray-200 text-soft-gray rounded-xl font-medium hover:bg-gray-300 transition text-xs">
+                    ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Portfolio Image Lightbox Modal -->
+    <div id="portfolioModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-3">
+        <div class="bg-white rounded-3xl max-w-sm w-full max-h-[85vh] flex flex-col shadow-2xl border-2 border-pastel-pink overflow-hidden">
+            <div class="p-3 bg-pastel-pink-soft border-b border-pastel-pink flex justify-between items-center">
+                <h3 id="portModalTitle" class="font-bold text-soft-gray text-xs">ตัวอย่างผลงาน</h3>
+                <button onclick="closePortfolioModal()" class="w-6 h-6 rounded-full bg-white text-soft-gray flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-4 overflow-y-auto">
+                <div class="rounded-2xl overflow-hidden border border-gray-100 mb-3 bg-pastel-yellow-soft/30">
+                    <img id="portModalImg" src="" alt="Portfolio Large" class="w-full max-h-72 object-contain mx-auto">
+                </div>
+                <span id="portModalTag" class="text-[9px] bg-pastel-pink text-pink-800 px-2.5 py-0.5 rounded-full font-semibold">หมวดหมู่</span>
+                <h4 id="portModalHeading" class="text-sm font-bold text-soft-gray mt-1.5">ชื่อผลงาน</h4>
+                <p id="portModalDesc" class="text-xs text-soft-gray-light mt-1 leading-relaxed">รายละเอียดผลงาน...</p>
+            </div>
+            <div class="p-3 bg-gray-50 border-t border-gray-100 text-right">
+                <button onclick="closePortfolioModal()" class="text-xs bg-pastel-pink text-soft-gray px-4 py-1.5 rounded-xl font-bold hover:bg-pastel-pink-dark hover:text-white transition">
+                    ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Reviews System Popup Modal (With Proof Upload) -->
+    <div id="reviewModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-3">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[88vh] flex flex-col shadow-2xl border-2 border-pastel-pink-soft overflow-hidden">
+            <div class="p-4 bg-pastel-pink-soft border-b border-pastel-pink/40 flex justify-between items-center">
+                <div>
+                    <h3 class="text-sm font-bold text-soft-gray flex items-center gap-1.5">
+                         รีวิวจากลูกค้า & เขียนรีวิว
+                    </h3>
+                    <p class="text-[10px] text-soft-gray-light">ให้คะแนนความพึงพอใจและแนบรูปภาพสลิปเพื่อยืนยัน</p>
+                </div>
+                <button onclick="toggleReviewModal(false)" class="w-6 h-6 rounded-full bg-white text-soft-gray hover:text-gray-700 flex items-center justify-center transition text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-4 overflow-y-auto flex-1 space-y-4">
+                <!-- Write Review Form -->
+                <div class="bg-pastel-yellow-soft/70 p-3.5 rounded-2xl border border-pastel-yellow">
+                    <h4 class="font-bold text-soft-gray mb-2 text-xs flex items-center gap-1">
+                        <i class="fa-solid fa-pen-nib text-amber-600"></i> เขียนรีวิวของคุณ
+                    </h4>
+                    
+                    <form id="reviewForm" onsubmit="handleReviewSubmit(event)" class="space-y-2.5">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-soft-gray mb-0.5">ให้คะแนนความพึงพอใจ:</label>
+                            <div class="flex gap-1 text-base text-amber-400 cursor-pointer" id="starInputGroup">
+                                <i class="fa-solid fa-star star-btn hover:scale-110 transition" onclick="setRating(1)"></i>
+                                <i class="fa-solid fa-star star-btn hover:scale-110 transition" onclick="setRating(2)"></i>
+                                <i class="fa-solid fa-star star-btn hover:scale-110 transition" onclick="setRating(3)"></i>
+                                <i class="fa-solid fa-star star-btn hover:scale-110 transition" onclick="setRating(4)"></i>
+                                <i class="fa-solid fa-star star-btn hover:scale-110 transition" onclick="setRating(5)"></i>
+                            </div>
+                            <input type="hidden" id="reviewRating" value="5" required>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[10px] font-semibold text-soft-gray mb-0.5">ชื่อ / นามปากกา:</label>
+                                <input type="text" id="reviewerName" placeholder="เช่น คุณเมย์" required 
+                                       class="w-full text-xs px-3 py-1.5 rounded-xl border border-gray-200 focus:outline-none focus:border-pastel-pink bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-semibold text-soft-gray mb-0.5 flex items-center justify-between">
+                                    <span>แนบสลิป/หลักฐาน:</span>
+                                    <span class="text-pink-500 font-normal text-[9px]">*เพื่อยืนยันอนุมัติ</span>
+                                </label>
+                                <input type="file" id="reviewProofInput" accept="image/*" required onchange="previewProofImage(event)" class="hidden">
+                                <div onclick="document.getElementById('reviewProofInput').click()" 
+                                     class="border border-dashed border-pastel-pink bg-white px-2.5 py-1.5 rounded-xl text-center cursor-pointer hover:bg-pastel-pink-soft/30 transition">
+                                    <div id="proofPreviewContainer" class="hidden">
+                                        <span class="text-[10px] text-emerald-600 font-medium"><i class="fa-solid fa-check-circle"></i> แนบรูปเรียบร้อยแล้ว</span>
+                                    </div>
+                                    <div id="proofPlaceholder">
+                                        <p class="text-[10px] text-soft-gray"><i class="fa-solid fa-cloud-arrow-up text-pink-400 mr-1"></i> กดแนบรูปหลักฐาน</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-semibold text-soft-gray mb-0.5">ข้อความรีวิว:</label>
+                            <textarea id="reviewText" rows="2" placeholder="เขียนความรู้สึก เช่น งานน่ารักมากเลย..." required 
+                                      class="w-full text-xs px-3 py-1.5 rounded-xl border border-gray-200 focus:outline-none focus:border-pastel-pink bg-white"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-pastel-pink hover:bg-pastel-pink-dark text-soft-gray hover:text-white font-bold py-2 rounded-xl transition text-xs flex items-center justify-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>ส่งรีวิวให้ร้านอนุมัติ</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Reviews List Display -->
+                <div>
+                    <h4 class="font-bold text-soft-gray text-xs mb-2">รายการรีวิวล่าสุด (ที่ผ่านการอนุมัติ)</h4>
+                    <div id="reviewsList" class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+
+            <div class="p-3 bg-gray-50 border-t border-gray-100 text-right">
+                <button onclick="toggleReviewModal(false)" class="px-4 py-1.5 bg-gray-200 text-soft-gray rounded-xl text-xs font-medium">
+                    ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: Admin Add Queue Modal -->
+    <div id="addQueueModal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-3">
+        <div class="bg-white rounded-3xl max-w-xs w-full p-4 shadow-2xl border-2 border-pastel-yellow">
+            <h3 class="font-bold text-soft-gray text-xs mb-2"> เพิ่มคิวงานใหม่ (Admin)</h3>
+            <form onsubmit="handleAddQueueSubmit(event)" class="space-y-2">
+                <div>
+                    <label class="block text-[9px] font-semibold text-soft-gray mb-0.5">รหัสคิว:</label>
+                    <input type="text" id="newQueueId" placeholder="เช่น Q-105" required class="w-full text-xs px-2.5 py-1 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-[9px] font-semibold text-soft-gray mb-0.5">ชื่อลูกค้า:</label>
+                    <input type="text" id="newQueueClient" placeholder="เช่น คุณแนน" required class="w-full text-xs px-2.5 py-1 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-[9px] font-semibold text-soft-gray mb-0.5">รายละเอียดงาน:</label>
+                    <input type="text" id="newQueueDetail" placeholder="เช่น โลโก้ร้านขนม" required class="w-full text-xs px-2.5 py-1 rounded-xl border border-gray-200">
+                </div>
+                <div>
+                    <label class="block text-[9px] font-semibold text-soft-gray mb-0.5">ระดับสถานะคิว:</label>
+                    <select id="newQueueStatus" class="w-full text-xs px-2.5 py-1 rounded-xl border border-gray-200 bg-white">
+                        <option value="raw_brief">รอบริฟ (0%)</option>
+                        <option value="briefed">บริฟแล้ว (25%)</option>
+                        <option value="in_progress">กำลังทำ (50%)</option>
+                        <option value="review">รอเช็ค (75%)</option>
+                        <option value="completed">ส่งงานแล้ว (100%)</option>
+                    </select>
+                </div>
+                <div class="flex gap-1.5 justify-end mt-3">
+                    <button type="button" onclick="closeAddQueueModal()" class="text-xs px-3 py-1 bg-gray-200 text-soft-gray rounded-xl">ยกเลิก</button>
+                    <button type="submit" class="text-xs px-3 py-1 bg-pastel-yellow text-amber-900 font-bold rounded-xl hover:bg-pastel-yellow-dark">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 bg-gray-800 text-white text-xs px-4 py-2.5 rounded-2xl shadow-lg opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+</body>
+</html>
